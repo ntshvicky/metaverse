@@ -3,18 +3,32 @@ import Movements from "./movements.js";
 import blockchain from "./Web3.js"
 import abi from "./abi/abi.json" assert { type: "json" };
 
+import * as THREE from "three";
+import { OrbitControls, MapControls } from "../controls/OrbitControls.js";
+import { SMART_CONTRACT } from "./contract.js";
+import { VRButton } from './VRButton.js';
+
 
 // Declaration of a new scene with Three.js
 const scene = new THREE.Scene();
 
 //Chnage background of scene
-scene.background = new THREE.Color(0x0bfd1e5)
+scene.background = new THREE.Color(0xbfd1e5)
 
 //render camera in scene
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
+
+// VR element rendering
+document.body.appendChild( VRButton.createButton( renderer ) );
+renderer.xr.enabled = true;
+
+
+// Orbit controls
+let controls = new OrbitControls(camera, renderer.domElement);
+
 
 // add light in scene 
 const ambient_light = new THREE.AmbientLight(0xbda355);
@@ -58,12 +72,17 @@ const cylinder = new THREE.Mesh( geometry_cylinder, material_cylinder );
 cylinder.position.set(20,5,0);
 scene.add( cylinder );
 
+window.addEventListener('resize', onWindowResize);
+
 //this need to see flat space from camera
 camera.position.set(10,5,40);
 
-//animate objects
-function animate() {
-    //rotate cube
+// set animate loop for VR 
+function animate(){
+    renderer.setAnimationLoop(render);
+}
+
+function render() {
     cube.rotation.x += 0.05;
     cube.rotation.y += 0.05;
 
@@ -72,37 +91,39 @@ function animate() {
 
     cylinder.rotation.x += 0.05;
 
-    //rotate camera
-    //camera.position.x += 0.01;
-	requestAnimationFrame( animate );
-
-    //move object on camera 
-    if(Movements.isPressed(37)){
+    requestAnimationFrame(animate);
+    controls.update();
+    // Movement to the left
+    if (Movements.isPressed(37)) {
         camera.position.x -= 0.5;
     }
-
-    if(Movements.isPressed(38)){
+    // Upward movement
+    if (Movements.isPressed(38)) {
         camera.position.x += 0.5;
         camera.position.y += 0.5;
     }
-
-    if(Movements.isPressed(39)){
+    // Movement to the right
+    if (Movements.isPressed(39)) {
         camera.position.x += 0.5;
     }
-
-    if(Movements.isPressed(40)){
+    // Downward movement
+    if (Movements.isPressed(40)) {
         camera.position.x -= 0.5;
         camera.position.y -= 0.5;
     }
 
     camera.lookAt(space.position);
-	renderer.render( scene, camera );
+    renderer.render(scene, camera);
 }
 animate();
-//it will make static
-//renderer.render( scene, camera );
 
+function onWindowResize() {
 
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+}
 
 //create new NFT in blockchain
 const btnMint = document.getElementById("mint");
@@ -124,14 +145,15 @@ function mintNFT() {
 
     //create web3 instance
     let web3 = new Web3(window.ethereum);
-    let contract = new web3.eth.Contract(abi, "0x69F6C92397dCf2dcB9A39872Ed419a65AEFFab56");
+    let contract = new web3.eth.Contract(abi, SMART_CONTRACT);
 
     web3.eth.requestAccounts().then((account)=> {
 
         //get my metamask address
         console.log("-> My account is: ", account);
 
-        document.getElementById("mint").value = "<i class='fa fa-spinner fa-spin'></i> Wait! Creating property in Metverse"
+        document.getElementById("mint").innerHTML = "<i class='fa fa-spinner fa-spin'></i> Wait! Creating property in Metverse"
+        document.getElementById("mint").disabled = true;
         //get the current supply from contract
         contract.methods.mint(nft_name, nft_width, nft_height, nft_depth, nft_x, nft_y, nft_z).send({from: account[0], value: 1000000000000000}).then((supply)=> {
             alert("-> New NFT created in Metaverse");

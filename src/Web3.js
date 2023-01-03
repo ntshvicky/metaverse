@@ -1,7 +1,7 @@
 import abi from "./abi/abi.json" assert { type: "json" };
 
+import { SMART_CONTRACT } from "./contract.js";
 
-const SMART_CONTRACT = "0x69F6C92397dCf2dcB9A39872Ed419a65AEFFab56";
 
 const blockchain = new Promise((res, rej)=> {
     // check if metamask is available
