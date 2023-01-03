@@ -1,6 +1,7 @@
 // import classes
 import Movements from "./movements.js";
 import blockchain from "./Web3.js"
+import abi from "./abi/abi.json" assert { type: "json" };
 
 
 // Declaration of a new scene with Three.js
@@ -101,8 +102,47 @@ animate();
 //it will make static
 //renderer.render( scene, camera );
 
-//web3 connection to data minted on blockchain and graphical representation
 
+
+//create new NFT in blockchain
+const btnMint = document.getElementById("mint");
+btnMint.addEventListener('click', mintNFT);
+
+function mintNFT() {
+    var nft_name = document.getElementById("nft_name").value;
+    var nft_width = document.getElementById("nft_width").value;
+    var nft_height = document.getElementById("nft_height").value;
+    var nft_depth = document.getElementById("nft_depth").value;
+    var nft_x = document.getElementById("nft_x").value;
+    var nft_y = document.getElementById("nft_y").value;
+    var nft_z = document.getElementById("nft_z").value;
+
+    // check if metamask is available
+    if(typeof window.ethereum == "undefined") {
+        rej("You should install Metamask to use it!");
+    }
+
+    //create web3 instance
+    let web3 = new Web3(window.ethereum);
+    let contract = new web3.eth.Contract(abi, "0x69F6C92397dCf2dcB9A39872Ed419a65AEFFab56");
+
+    web3.eth.requestAccounts().then((account)=> {
+
+        //get my metamask address
+        console.log("-> My account is: ", account);
+
+        document.getElementById("mint").value = "<i class='fa fa-spinner fa-spin'></i> Wait! Creating property in Metverse"
+        //get the current supply from contract
+        contract.methods.mint(nft_name, nft_width, nft_height, nft_depth, nft_x, nft_y, nft_z).send({from: account[0], value: 1000000000000000}).then((supply)=> {
+            alert("-> New NFT created in Metaverse");
+            location.reload()
+        });
+
+    });
+
+}
+
+//web3 connection to data minted on blockchain and graphical representation
 blockchain.then((result)=> {
     result.building.forEach((building, index) => {
         if(index <= result.supply) {
