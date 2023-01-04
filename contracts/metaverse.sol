@@ -42,8 +42,8 @@ contract metaverse is ERC721, DefaultOperatorFilterer, IERC2981, Ownable {
     }
 
     // Obtaining the buildings made in the metaverse
-    function getOwnerBuildings() public view returns (Building[] memory) {
-        return NFTOwners[msg.sender];
+    function getOwnerBuildings(address propertyOwner) public view returns (Building[] memory) {
+        return NFTOwners[propertyOwner];
     }
 
     // Current supply of NFT Token

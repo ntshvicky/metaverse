@@ -32,7 +32,7 @@ let controls = new OrbitControls(camera, renderer.domElement);
 
 // add light in scene 
 const ambient_light = new THREE.AmbientLight(0xbda355);
-const direction_light = new THREE.DirectionalLight(0xffffff, 1);
+const direction_light = new THREE.DirectionalLight(0xffffff, 2);
 //fit light in scene
 ambient_light.add(direction_light);
 scene.add(ambient_light)

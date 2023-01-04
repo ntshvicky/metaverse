@@ -74,8 +74,8 @@
       ]
     },
     "/Users/gbwbh/Documents/my-projects/blockchain-projects/Metaverse/contracts/metaverse.sol": {
-      "lastModificationDate": 1672761390742,
-      "contentHash": "86dd69d130777e8e7381bb8f5242f85c",
+      "lastModificationDate": 1672811337747,
+      "contentHash": "685df9367a231eb9af2c9fa4e22bfe81",
       "sourceName": "contracts/metaverse.sol",
       "solcConfig": {
         "version": "0.8.13",
